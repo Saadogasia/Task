@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import workerdata from "./workerprofiledata.json";
 import { categories } from "./categoriesdata";
@@ -19,6 +20,15 @@ const { width } = Dimensions.get("window");
 export default function CategoriesScreen() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   const filteredWorkers = workerdata.workers.filter((worker) => {
     const matchesCategory =
@@ -30,6 +40,14 @@ export default function CategoriesScreen() {
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,9 +120,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   categoryScroll: {
     backgroundColor: "#F2F3F4",
-    marginTop: 40,
+    marginTop: 10,
     marginBottom: 10,
     paddingVertical: 10,
   },
